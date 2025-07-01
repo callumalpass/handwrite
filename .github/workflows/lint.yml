@@ -1,0 +1,37 @@
+name: Lint
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e ".[dev]"
+    
+    - name: Lint with flake8
+      run: |
+        flake8 handwriting_processor tests --statistics
+    
+    - name: Check formatting with black
+      run: |
+        black --check --diff handwriting_processor tests
+    
+    - name: Type check (if mypy is added later)
+      run: |
+        echo "Type checking can be added with mypy in the future"
+      continue-on-error: true
