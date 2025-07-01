@@ -37,3 +37,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.x.x] - Previous Python Versions
 
 See git history for Python version changelog.
+

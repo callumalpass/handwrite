@@ -73,7 +73,9 @@ func runProcess(cmd *cobra.Command, args []string) {
 	if err != nil {
 		log.Fatalf("Failed to create Gemini client: %v", err)
 	}
-	defer geminiClient.Close()
+	defer func() {
+		geminiClient.Close()
+	}()
 
 	// Get list of input files
 	inputFiles, err := processor.GetSupportedFiles(inputPath)
@@ -146,13 +148,13 @@ func processFilesConcurrently(inputFiles []string, outputDir string, cfg *config
 	}
 }
 
-func worker(id int, jobs <-chan string, results chan<- bool, outputDir string, cfg *config.Config, geminiClient *gemini.Client, bar *progressbar.ProgressBar, wg *sync.WaitGroup) {
+func worker(_ int, jobs <-chan string, results chan<- bool, outputDir string, cfg *config.Config, geminiClient *gemini.Client, bar *progressbar.ProgressBar, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	for inputFile := range jobs {
 		success := processFile(inputFile, outputDir, cfg, geminiClient)
 		results <- success
-		bar.Add(1)
+		_ = bar.Add(1)
 	}
 }
 
@@ -233,7 +235,7 @@ func processFile(inputPath, outputDir string, cfg *config.Config, geminiClient *
 		cfg.Gemini.Model,
 		cfg.Template.Variables,
 	)
-	
+
 	log.Printf("Template data content length: %d", len(templateData.Content))
 
 	// Render template
@@ -251,3 +253,4 @@ func processFile(inputPath, outputDir string, cfg *config.Config, geminiClient *
 
 	return true
 }
+

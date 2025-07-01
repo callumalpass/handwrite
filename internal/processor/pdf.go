@@ -23,16 +23,16 @@ type PDFData struct {
 
 func GetPDFData(inputPath string) (*PDFData, error) {
 	ext := strings.ToLower(filepath.Ext(inputPath))
-	
+
 	if ext != ".pdf" {
 		return nil, fmt.Errorf("not a PDF file: %s", ext)
 	}
-	
+
 	data, err := os.ReadFile(inputPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read PDF file: %w", err)
 	}
-	
+
 	return &PDFData{
 		Data:     data,
 		Filename: filepath.Base(inputPath),
@@ -41,7 +41,7 @@ func GetPDFData(inputPath string) (*PDFData, error) {
 
 func GetImagesFromFile(inputPath string) ([]ImageData, error) {
 	ext := strings.ToLower(filepath.Ext(inputPath))
-	
+
 	switch ext {
 	case ".pdf":
 		return nil, fmt.Errorf("PDF files should be processed with GetPDFData")
@@ -61,7 +61,7 @@ func loadImageFile(imagePath string) ([]ImageData, error) {
 
 	var img image.Image
 	ext := strings.ToLower(filepath.Ext(imagePath))
-	
+
 	switch ext {
 	case ".png":
 		img, err = png.Decode(file)
@@ -84,7 +84,7 @@ func loadImageFile(imagePath string) ([]ImageData, error) {
 
 func GetSupportedFiles(inputPath string) ([]string, error) {
 	var files []string
-	
+
 	info, err := os.Stat(inputPath)
 	if err != nil {
 		return nil, fmt.Errorf("path does not exist: %w", err)
@@ -103,11 +103,11 @@ func GetSupportedFiles(inputPath string) ([]string, error) {
 		if err != nil {
 			return err
 		}
-		
+
 		if !info.IsDir() && isSupportedFile(path) {
 			files = append(files, path)
 		}
-		
+
 		return nil
 	})
 
@@ -117,12 +117,13 @@ func GetSupportedFiles(inputPath string) ([]string, error) {
 func isSupportedFile(filename string) bool {
 	ext := strings.ToLower(filepath.Ext(filename))
 	supportedExts := []string{".pdf", ".png", ".jpg", ".jpeg"}
-	
+
 	for _, supportedExt := range supportedExts {
 		if ext == supportedExt {
 			return true
 		}
 	}
-	
+
 	return false
 }
+

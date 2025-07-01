@@ -66,7 +66,7 @@ Model: {{.ModelUsed}}`
 	}
 
 	// Create test data
-	data := template.TemplateData{
+	data := template.Data{
 		Content:   "Test handwritten content",
 		Filename:  "test.pdf",
 		PageCount: 2,
@@ -109,7 +109,7 @@ func TestRenderTemplate_TemplateNotFound(t *testing.T) {
 	templatePath := filepath.Join(tempDir, "nonexistent.md")
 	outputPath := filepath.Join(tempDir, "output.md")
 
-	data := template.TemplateData{}
+	data := template.Data{}
 
 	err := template.RenderTemplate(templatePath, outputPath, data)
 	if err == nil {
@@ -120,3 +120,4 @@ func TestRenderTemplate_TemplateNotFound(t *testing.T) {
 		t.Errorf("Expected 'template file not found' error, got: %v", err)
 	}
 }
+

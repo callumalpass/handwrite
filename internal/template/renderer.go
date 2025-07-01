@@ -8,20 +8,20 @@ import (
 	"time"
 )
 
-type TemplateData struct {
-	Content              string
-	Filename             string
-	AbsolutePDFPath      string
-	RelativePDFPath      string
-	SourcePathAbsolute   string
-	SourcePathRelative   string
-	DatetimeProcessed    string
-	PageCount            int
-	ModelUsed            string
-	CustomVariables      map[string]interface{}
+type Data struct {
+	Content            string
+	Filename           string
+	AbsolutePDFPath    string
+	RelativePDFPath    string
+	SourcePathAbsolute string
+	SourcePathRelative string
+	DatetimeProcessed  string
+	PageCount          int
+	ModelUsed          string
+	CustomVariables    map[string]interface{}
 }
 
-func RenderTemplate(templatePath, outputPath string, data TemplateData) error {
+func RenderTemplate(templatePath, outputPath string, data Data) error {
 	// Check if template exists
 	if _, err := os.Stat(templatePath); os.IsNotExist(err) {
 		return fmt.Errorf("template file not found: %s", templatePath)
@@ -60,20 +60,21 @@ func RenderTemplate(templatePath, outputPath string, data TemplateData) error {
 	return nil
 }
 
-func CreateTemplateData(content, filename, inputPath, outputDir string, pageCount int, modelUsed string, customVars map[string]interface{}) TemplateData {
+func CreateTemplateData(content, filename, inputPath, outputDir string, pageCount int, modelUsed string, customVars map[string]interface{}) Data {
 	absoluteInputPath, _ := filepath.Abs(inputPath)
 	relativeInputPath, _ := filepath.Rel(outputDir, absoluteInputPath)
-	
-	return TemplateData{
-		Content:              content,
-		Filename:             filename,
-		AbsolutePDFPath:      absoluteInputPath,
-		RelativePDFPath:      relativeInputPath,
-		SourcePathAbsolute:   absoluteInputPath,
-		SourcePathRelative:   relativeInputPath,
-		DatetimeProcessed:    time.Now().Format(time.RFC3339),
-		PageCount:            pageCount,
-		ModelUsed:            modelUsed,
-		CustomVariables:      customVars,
+
+	return Data{
+		Content:            content,
+		Filename:           filename,
+		AbsolutePDFPath:    absoluteInputPath,
+		RelativePDFPath:    relativeInputPath,
+		SourcePathAbsolute: absoluteInputPath,
+		SourcePathRelative: relativeInputPath,
+		DatetimeProcessed:  time.Now().Format(time.RFC3339),
+		PageCount:          pageCount,
+		ModelUsed:          modelUsed,
+		CustomVariables:    customVars,
 	}
 }
+

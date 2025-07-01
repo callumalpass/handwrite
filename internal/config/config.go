@@ -40,7 +40,7 @@ func GetDefaultConfigPath() string {
 
 func SetupDefaultConfig() error {
 	configPath := GetDefaultConfigPath()
-	
+
 	if _, err := os.Stat(configPath); err == nil {
 		return fmt.Errorf("config file already exists at %s", configPath)
 	}
@@ -79,7 +79,7 @@ func LoadConfig(configPath string) (*Config, error) {
 	_ = godotenv.Load()
 
 	viper.SetConfigType("yaml")
-	
+
 	if configPath != "" {
 		viper.SetConfigFile(configPath)
 	} else {
@@ -134,3 +134,4 @@ func GetGeminiAPIKey() (string, error) {
 	}
 	return apiKey, nil
 }
+

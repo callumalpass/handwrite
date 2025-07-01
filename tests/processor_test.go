@@ -37,9 +37,10 @@ func TestGetImagesFromFile_UnsupportedFormat(t *testing.T) {
 	if err == nil {
 		t.Error("Expected error for unsupported file format")
 	}
-	
+
 	expectedMsg := "unsupported file type: .txt"
 	if err.Error() != expectedMsg {
 		t.Errorf("Expected error message '%s', got '%s'", expectedMsg, err.Error())
 	}
 }
+

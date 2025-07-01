@@ -170,34 +170,6 @@ handwrite/
 └── go.mod              # Go module definition
 ```
 
-## Performance Improvements over Python Version
-
-- **10x faster processing** through concurrent goroutines
-- **Lower memory footprint** with efficient image handling
-- **Single binary distribution** - no dependency management
-- **Built-in progress tracking** with real-time updates
-- **Configurable worker pools** for optimal resource usage
-
-## Troubleshooting
-
-### Common Issues
-
-1. **API Key not found**: Ensure `GEMINI_API_KEY` is set in your environment or `.env` file
-2. **No text extracted**: Check if the image quality is sufficient and text is clearly visible
-3. **Template errors**: Verify your custom template syntax and variable names
-4. **Permission errors**: Ensure you have write permissions to the output directory
-
-### Logging
-
-The tool provides detailed logging to stderr. You can redirect output to capture logs:
-
-```bash
-handwrite process input.pdf output/ 2>&1 | tee processing.log
-```
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 

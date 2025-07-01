@@ -19,14 +19,14 @@ type Client struct {
 
 func NewClient(apiKey string, modelName string) (*Client, error) {
 	ctx := context.Background()
-	
+
 	client, err := genai.NewClient(ctx, option.WithAPIKey(apiKey))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create Gemini client: %w", err)
 	}
 
 	model := client.GenerativeModel(modelName)
-	
+
 	return &Client{
 		client: client,
 		model:  model,
@@ -74,10 +74,9 @@ func (c *Client) ExtractTextFromImage(ctx context.Context, img image.Image, prom
 	return "", fmt.Errorf("unexpected content type returned from Gemini")
 }
 
-
 func (c *Client) ExtractTextFromPDF(ctx context.Context, pdfData []byte, prompt string) (string, error) {
 	log.Printf("Processing PDF of size: %d bytes", len(pdfData))
-	
+
 	// Create blob from PDF data (supports PDFs up to 20MB)
 	blob := genai.Blob{
 		MIMEType: "application/pdf",
@@ -123,40 +122,41 @@ func min(a, b int) int {
 
 func (c *Client) ExtractTextFromImageWithRetry(ctx context.Context, img image.Image, prompt string, maxRetries int) (string, error) {
 	var lastErr error
-	
+
 	for i := 0; i < maxRetries; i++ {
 		result, err := c.ExtractTextFromImage(ctx, img, prompt)
 		if err == nil {
 			return result, nil
 		}
-		
+
 		lastErr = err
 		log.Printf("Attempt %d failed: %v", i+1, err)
-		
+
 		if i < maxRetries-1 {
 			log.Printf("Retrying...")
 		}
 	}
-	
+
 	return "", fmt.Errorf("failed after %d attempts: %w", maxRetries, lastErr)
 }
 
 func (c *Client) ExtractTextFromPDFWithRetry(ctx context.Context, pdfData []byte, prompt string, maxRetries int) (string, error) {
 	var lastErr error
-	
+
 	for i := 0; i < maxRetries; i++ {
 		result, err := c.ExtractTextFromPDF(ctx, pdfData, prompt)
 		if err == nil {
 			return result, nil
 		}
-		
+
 		lastErr = err
 		log.Printf("Attempt %d failed: %v", i+1, err)
-		
+
 		if i < maxRetries-1 {
 			log.Printf("Retrying...")
 		}
 	}
-	
+
 	return "", fmt.Errorf("failed after %d attempts: %w", maxRetries, lastErr)
 }
+

@@ -22,7 +22,7 @@ var setupCmd = &cobra.Command{
 		if err := config.SetupDefaultConfig(); err != nil {
 			log.Fatalf("Failed to setup config: %v", err)
 		}
-		
+
 		configPath := config.GetDefaultConfigPath()
 		fmt.Printf("Created default configuration at: %s\n", configPath)
 	},
@@ -31,3 +31,4 @@ var setupCmd = &cobra.Command{
 func init() {
 	configCmd.AddCommand(setupCmd)
 }
+
