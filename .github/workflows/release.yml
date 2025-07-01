@@ -8,36 +8,93 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
-    
+    permissions:
+      contents: write
+      packages: write
+
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up Python
-      uses: actions/setup-python@v4
+    - name: Check out code
+      uses: actions/checkout@v4
       with:
-        python-version: '3.11'
-    
-    - name: Install build dependencies
+        fetch-depth: 0
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: 1.22
+
+    - name: Cache Go modules
+      uses: actions/cache@v3
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-1.22-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-1.22-
+
+    - name: Run tests
+      run: go test -v ./tests/...
+
+    - name: Build binaries
       run: |
-        python -m pip install --upgrade pip
-        pip install build twine
-    
-    - name: Build package
-      run: python -m build
-    
-    - name: Check package
-      run: twine check dist/*
-    
+        mkdir -p dist
+        
+        # Linux
+        GOOS=linux GOARCH=amd64 go build -ldflags="-s -w -X main.version=${{ github.ref_name }}" -o dist/handwrite-linux-amd64 .
+        GOOS=linux GOARCH=arm64 go build -ldflags="-s -w -X main.version=${{ github.ref_name }}" -o dist/handwrite-linux-arm64 .
+        
+        # macOS
+        GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w -X main.version=${{ github.ref_name }}" -o dist/handwrite-darwin-amd64 .
+        GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w -X main.version=${{ github.ref_name }}" -o dist/handwrite-darwin-arm64 .
+        
+        # Windows
+        GOOS=windows GOARCH=amd64 go build -ldflags="-s -w -X main.version=${{ github.ref_name }}" -o dist/handwrite-windows-amd64.exe .
+
+    - name: Create archives
+      run: |
+        cd dist
+        
+        # Create tar.gz for Unix systems
+        tar -czf handwrite-linux-amd64.tar.gz handwrite-linux-amd64
+        tar -czf handwrite-linux-arm64.tar.gz handwrite-linux-arm64
+        tar -czf handwrite-darwin-amd64.tar.gz handwrite-darwin-amd64
+        tar -czf handwrite-darwin-arm64.tar.gz handwrite-darwin-arm64
+        
+        # Create zip for Windows
+        zip handwrite-windows-amd64.zip handwrite-windows-amd64.exe
+
+    - name: Generate checksums
+      run: |
+        cd dist
+        sha256sum *.tar.gz *.zip > checksums.txt
+
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
       with:
-        files: dist/*
+        files: |
+          dist/*.tar.gz
+          dist/*.zip
+          dist/checksums.txt
         generate_release_notes: true
+        draft: false
+        prerelease: false
+        body: |
+          ## Installation
+
+          ### Binary Downloads
+          Download the appropriate binary for your system from the assets below.
+
+          ### Using Go Install
+          ```bash
+          go install github.com/callumalpass/handwrite@${{ github.ref_name }}
+          ```
+
+          ### Verification
+          Verify your download using the provided checksums:
+          ```bash
+          sha256sum -c checksums.txt
+          ```
+
+          ## Changes
+          See the automatically generated release notes below.
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    
-    - name: Publish to PyPI
-      env:
-        TWINE_USERNAME: __token__
-        TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
-      run: twine upload dist/*

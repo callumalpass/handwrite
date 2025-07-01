@@ -1,9 +1,0 @@
-gemini:
-  model: "gemini-1.5-pro"
-  prompt: |
-    Extract the handwritten text from this image.
-    - Use $$ for LaTeX, not ```latex.
-    - Transcribe the text exactly as it appears.
-    - The output must be only the transcribed Markdown, with no additional commentary.
-template:
-  path: "templates/note_template.md"

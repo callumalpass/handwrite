@@ -1,0 +1,48 @@
+run:
+  timeout: 5m
+  modules-download-mode: readonly
+
+linters:
+  enable:
+    - errcheck
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - typecheck
+    - unused
+    - gocritic
+    - gofmt
+    - goimports
+    - gosec
+    - misspell
+    - unconvert
+    - unparam
+    - gocyclo
+    - revive
+
+linters-settings:
+  gocyclo:
+    min-complexity: 15
+  
+  revive:
+    rules:
+      - name: exported
+        disabled: false
+      - name: var-naming
+        disabled: false
+      - name: package-comments
+        disabled: true
+  
+  gosec:
+    excludes:
+      - G204 # Subprocess launched with variable
+
+issues:
+  exclude-rules:
+    - path: tests/
+      linters:
+        - gosec
+    - path: cmd/
+      linters:
+        - gocyclo
