@@ -12,22 +12,18 @@ A command-line tool to convert handwritten notes from PDF files into organized M
 
 ## Installation
 
-It is recommended to install the tool using `pipx` to avoid conflicts with system packages:
+Install from the repository:
 
 ```bash
-pipx install .
+pip install git+https://github.com/callumalpass/handwrite.git
 ```
 
-If you prefer to manage your own virtual environments, you can install it with `pip`:
+For local development:
 
 ```bash
-pip install .
-```
-
-For development, install the tool in editable mode:
-
-```bash
-pip install -e .
+git clone https://github.com/callumalpass/handwrite.git
+cd handwrite
+pip install -e ".[dev]"
 ```
 
 ## Configuration
@@ -168,6 +164,13 @@ Run tests:
 python -m pytest tests/
 ```
 
+Run linting:
+
+```bash
+flake8 handwriting_processor tests
+black --check handwriting_processor tests
+```
+
 ## Troubleshooting
 
 ### Common Issues
@@ -179,7 +182,7 @@ python -m pytest tests/
 
 ### Logging
 
-The tool provides detailed logging. For debug information, you can modify the logging level in the source code or redirect output:
+The tool provides detailed logging at INFO level by default. You can redirect output to capture logs:
 
 ```bash
 handwrite process input.pdf output/ 2>&1 | tee processing.log
