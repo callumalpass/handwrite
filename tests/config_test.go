@@ -69,4 +69,3 @@ func TestSetupDefaultConfig(t *testing.T) {
 		t.Error("Expected error when trying to setup config that already exists")
 	}
 }
-

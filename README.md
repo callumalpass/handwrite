@@ -177,4 +177,4 @@ This project is licensed under the MIT License.
 
 ## Acknowledgements
 
-This Go rewrite improves upon the original Python version, providing better performance and easier distribution while maintaining full feature compatibility.
+This project is inspired by tejas-raskar's [noted.md](https://github.com/tejas-raskar/noted.md).

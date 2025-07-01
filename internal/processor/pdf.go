@@ -126,4 +126,3 @@ func isSupportedFile(filename string) bool {
 
 	return false
 }
-

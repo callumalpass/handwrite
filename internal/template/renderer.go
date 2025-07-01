@@ -77,4 +77,3 @@ func CreateTemplateData(content, filename, inputPath, outputDir string, pageCoun
 		CustomVariables:    customVars,
 	}
 }
-

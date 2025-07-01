@@ -120,4 +120,3 @@ func TestRenderTemplate_TemplateNotFound(t *testing.T) {
 		t.Errorf("Expected 'template file not found' error, got: %v", err)
 	}
 }
-

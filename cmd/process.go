@@ -40,51 +40,52 @@ func init() {
 }
 
 func runProcess(cmd *cobra.Command, args []string) {
-	inputPath := args[0]
-	outputDir := args[1]
+	if err := processCommand(args[0], args[1]); err != nil {
+		log.Fatalf("Process failed: %v", err)
+	}
+}
 
+func processCommand(inputPath, outputDir string) error {
 	// Validate output directory
 	if info, err := os.Stat(outputDir); err != nil {
 		if os.IsNotExist(err) {
 			if err := os.MkdirAll(outputDir, 0755); err != nil {
-				log.Fatalf("Failed to create output directory: %v", err)
+				return fmt.Errorf("failed to create output directory: %w", err)
 			}
 		} else {
-			log.Fatalf("Error accessing output directory: %v", err)
+			return fmt.Errorf("error accessing output directory: %w", err)
 		}
 	} else if !info.IsDir() {
-		log.Fatalf("Output path is not a directory: %s", outputDir)
+		return fmt.Errorf("output path is not a directory: %s", outputDir)
 	}
 
 	// Load configuration
 	cfg, err := config.LoadConfig(configFile)
 	if err != nil {
-		log.Fatalf("Failed to load config: %v", err)
+		return fmt.Errorf("failed to load config: %w", err)
 	}
 
 	// Get Gemini API key
 	apiKey, err := config.GetGeminiAPIKey()
 	if err != nil {
-		log.Fatalf("Failed to get Gemini API key: %v", err)
+		return fmt.Errorf("failed to get Gemini API key: %w", err)
 	}
 
 	// Create Gemini client
 	geminiClient, err := gemini.NewClient(apiKey, cfg.Gemini.Model)
 	if err != nil {
-		log.Fatalf("Failed to create Gemini client: %v", err)
+		return fmt.Errorf("failed to create Gemini client: %w", err)
 	}
-	defer func() {
-		geminiClient.Close()
-	}()
+	defer geminiClient.Close()
 
 	// Get list of input files
 	inputFiles, err := processor.GetSupportedFiles(inputPath)
 	if err != nil {
-		log.Fatalf("Failed to get input files: %v", err)
+		return fmt.Errorf("failed to get input files: %w", err)
 	}
 
 	if len(inputFiles) == 0 {
-		log.Fatalf("No supported files found in: %s", inputPath)
+		return fmt.Errorf("no supported files found in: %s", inputPath)
 	}
 
 	fmt.Printf("Processing %d file(s) with %d workers...\n", len(inputFiles), workers)
@@ -101,8 +102,10 @@ func runProcess(cmd *cobra.Command, args []string) {
 	fmt.Printf("  Failed: %d\n", results.failed)
 
 	if results.failed > 0 {
-		os.Exit(1)
+		return fmt.Errorf("processing failed: %d files failed", results.failed)
 	}
+
+	return nil
 }
 
 type ProcessingResults struct {
@@ -253,4 +256,3 @@ func processFile(inputPath, outputDir string, cfg *config.Config, geminiClient *
 
 	return true
 }
-

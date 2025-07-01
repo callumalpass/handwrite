@@ -32,4 +32,3 @@ func init() {
 	rootCmd.AddCommand(processCmd)
 	rootCmd.AddCommand(configCmd)
 }
-

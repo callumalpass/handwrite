@@ -159,4 +159,3 @@ func (c *Client) ExtractTextFromPDFWithRetry(ctx context.Context, pdfData []byte
 
 	return "", fmt.Errorf("failed after %d attempts: %w", maxRetries, lastErr)
 }
-

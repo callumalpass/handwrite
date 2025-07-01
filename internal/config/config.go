@@ -67,7 +67,7 @@ output:
   encoding: "utf-8"
 `
 
-	if err := os.WriteFile(configPath, []byte(defaultConfig), 0644); err != nil {
+	if err := os.WriteFile(configPath, []byte(defaultConfig), 0600); err != nil {
 		return fmt.Errorf("failed to write config file: %w", err)
 	}
 
@@ -134,4 +134,3 @@ func GetGeminiAPIKey() (string, error) {
 	}
 	return apiKey, nil
 }
-

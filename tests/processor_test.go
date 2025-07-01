@@ -43,4 +43,3 @@ func TestGetImagesFromFile_UnsupportedFormat(t *testing.T) {
 		t.Errorf("Expected error message '%s', got '%s'", expectedMsg, err.Error())
 	}
 }
-
