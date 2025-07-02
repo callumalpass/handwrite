@@ -69,7 +69,7 @@ func TestSetupDefaultConfig(t *testing.T) {
 	if err == nil {
 		t.Error("Expected error when trying to setup config that already exists")
 	}
-	
+
 	// Verify the error message is what we expect
 	expectedErrMsg := "config file already exists"
 	if !strings.Contains(err.Error(), expectedErrMsg) {
