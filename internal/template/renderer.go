@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"text/template"
 	"time"
 )
@@ -65,7 +66,7 @@ func CreateTemplateData(content, filename, inputPath, outputDir string, pageCoun
 	relativeInputPath, _ := filepath.Rel(outputDir, absoluteInputPath)
 
 	return Data{
-		Content:            content,
+		Content:            strings.ReplaceAll(strings.ReplaceAll(content, "{{", "\\{\\{"), "}}", "\\}\\}"),
 		Filename:           filename,
 		AbsolutePDFPath:    absoluteInputPath,
 		RelativePDFPath:    relativeInputPath,
