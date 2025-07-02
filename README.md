@@ -1,6 +1,6 @@
-# Handwrite - Go Edition
+# Handwrite
 
-A high-performance command-line tool written in Go to convert handwritten notes from PDF files into organized Markdown documents using Google's Gemini AI.
+A command-line tool written in Go to convert handwritten notes from PDF files into organized Markdown documents using Google's Gemini AI.
 
 ## Features
 
