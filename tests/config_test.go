@@ -3,6 +3,7 @@ package tests
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/callumalpass/handwrite/internal/config"
@@ -67,5 +68,11 @@ func TestSetupDefaultConfig(t *testing.T) {
 	err = config.SetupDefaultConfig()
 	if err == nil {
 		t.Error("Expected error when trying to setup config that already exists")
+	}
+	
+	// Verify the error message is what we expect
+	expectedErrMsg := "config file already exists"
+	if !strings.Contains(err.Error(), expectedErrMsg) {
+		t.Errorf("Expected error to contain '%s', got: %v", expectedErrMsg, err)
 	}
 }
