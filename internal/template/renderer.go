@@ -11,6 +11,7 @@ import (
 
 type Data struct {
 	Content            string
+	Tags               []string
 	Filename           string
 	AbsolutePDFPath    string
 	RelativePDFPath    string
@@ -67,6 +68,26 @@ func CreateTemplateData(content, filename, inputPath, outputDir string, pageCoun
 
 	return Data{
 		Content:            strings.ReplaceAll(strings.ReplaceAll(content, "{{", "\\{\\{"), "}}", "\\}\\}"),
+		Tags:               []string{}, // Default empty tags
+		Filename:           filename,
+		AbsolutePDFPath:    absoluteInputPath,
+		RelativePDFPath:    relativeInputPath,
+		SourcePathAbsolute: absoluteInputPath,
+		SourcePathRelative: relativeInputPath,
+		DatetimeProcessed:  time.Now().Format(time.RFC3339),
+		PageCount:          pageCount,
+		ModelUsed:          modelUsed,
+		CustomVariables:    customVars,
+	}
+}
+
+func CreateStructuredTemplateData(content string, tags []string, filename, inputPath, outputDir string, pageCount int, modelUsed string, customVars map[string]interface{}) Data {
+	absoluteInputPath, _ := filepath.Abs(inputPath)
+	relativeInputPath, _ := filepath.Rel(outputDir, absoluteInputPath)
+
+	return Data{
+		Content:            strings.ReplaceAll(strings.ReplaceAll(content, "{{", "\\{\\{"), "}}", "\\}\\}"),
+		Tags:               tags,
 		Filename:           filename,
 		AbsolutePDFPath:    absoluteInputPath,
 		RelativePDFPath:    relativeInputPath,

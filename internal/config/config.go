@@ -53,10 +53,14 @@ func SetupDefaultConfig() error {
 	defaultConfig := `gemini:
   model: "gemini-1.5-pro"
   prompt: |
-    Extract the handwritten text from this image.
+    Extract the handwritten text from this image and identify any hashtags.
+    - Put the main text content in the "content" field, preserving ALL line breaks and formatting
+    - Find any hashtags (words starting with #) and list them in the "tags" array
+    - If no hashtags are found, return an empty array for tags
     - Use $ for LaTeX, not` + "```" + `latex.
-    - Transcribe the text exactly as it appears.
-    - The output must be only the transcribed Markdown, with no additional commentary.
+    - Transcribe the text exactly as it appears, including newlines, spacing, and paragraph breaks.
+    - IMPORTANT: Preserve all line breaks and whitespace in the content field.
+    - Return the response as JSON with "content" and "tags" fields.
 
 template:
   path: "templates/note_template.md"
@@ -111,10 +115,14 @@ func getDefaultConfig() *Config {
 	return &Config{
 		Gemini: GeminiConfig{
 			Model: "gemini-1.5-pro",
-			Prompt: `Extract the handwritten text from this image.
+			Prompt: `Extract the handwritten text from this image and identify any hashtags.
+- Put the main text content in the "content" field, preserving ALL line breaks and formatting
+- Find any hashtags (words starting with #) and list them in the "tags" array
+- If no hashtags are found, return an empty array for tags
 - Use $ for LaTeX, not ` + "```" + `latex.
-- Transcribe the text exactly as it appears.
-- The output must be only the transcribed Markdown, with no additional commentary.`,
+- Transcribe the text exactly as it appears, including newlines, spacing, and paragraph breaks.
+- IMPORTANT: Preserve all line breaks and whitespace in the content field.
+- Return the response as JSON with "content" and "tags" fields.`,
 		},
 		Template: TemplateConfig{
 			Path:      "templates/note_template.md",

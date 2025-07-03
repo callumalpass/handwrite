@@ -167,6 +167,7 @@ func processFile(inputPath, outputDir string, cfg *config.Config, geminiClient *
 
 	ext := strings.ToLower(filepath.Ext(inputPath))
 	var fullText string
+	var tags []string
 	var pageCount int = 1 // Default for single files
 
 	if ext == ".pdf" {
@@ -177,15 +178,16 @@ func processFile(inputPath, outputDir string, cfg *config.Config, geminiClient *
 			return false
 		}
 
-		// Process entire PDF with OCR
-		text, err := geminiClient.ExtractTextFromPDFWithRetry(ctx, pdfData.Data, cfg.Gemini.Prompt, 3)
+		// Process entire PDF with structured OCR
+		result, err := geminiClient.ExtractStructuredTextFromPDF(ctx, pdfData.Data, cfg.Gemini.Prompt)
 		if err != nil {
 			log.Printf("Error processing PDF %s: %v", inputPath, err)
 			return false
 		}
 
-		fullText = text
-		log.Printf("Full text extracted, length: %d", len(fullText))
+		fullText = result.Content
+		tags = result.Tags
+		log.Printf("Full text extracted, length: %d, tags: %v", len(fullText), tags)
 		// Note: We don't know exact page count without parsing, but Gemini processes all pages
 	} else {
 		// Handle image files
@@ -202,20 +204,23 @@ func processFile(inputPath, outputDir string, cfg *config.Config, geminiClient *
 
 		pageCount = len(images)
 		var pageResults []string
+		var allTags []string
 
-		// Process each image with OCR
+		// Process each image with structured OCR
 		for _, imgData := range images {
-			text, err := geminiClient.ExtractTextFromImageWithRetry(ctx, imgData.Image, cfg.Gemini.Prompt, 3)
+			result, err := geminiClient.ExtractStructuredTextFromImage(ctx, imgData.Image, cfg.Gemini.Prompt)
 			if err != nil {
 				log.Printf("Error processing page %d of %s: %v", imgData.PageNum, inputPath, err)
 				pageResults = append(pageResults, fmt.Sprintf("Error processing page %d: %v", imgData.PageNum, err))
 			} else {
-				pageResults = append(pageResults, text)
+				pageResults = append(pageResults, result.Content)
+				allTags = append(allTags, result.Tags...)
 			}
 		}
 
-		// Combine all page results
+		// Combine all page results and deduplicate tags
 		fullText = strings.Join(pageResults, "\n\n")
+		tags = deduplicateTags(allTags)
 	}
 
 	if strings.TrimSpace(fullText) == "" {
@@ -228,9 +233,10 @@ func processFile(inputPath, outputDir string, cfg *config.Config, geminiClient *
 	outputFilename := baseName + ".md"
 	outputPath := filepath.Join(outputDir, outputFilename)
 
-	// Create template data
-	templateData := template.CreateTemplateData(
+	// Create template data with structured content
+	templateData := template.CreateStructuredTemplateData(
 		fullText,
+		tags,
 		filepath.Base(inputPath),
 		inputPath,
 		outputDir,
@@ -239,7 +245,7 @@ func processFile(inputPath, outputDir string, cfg *config.Config, geminiClient *
 		cfg.Template.Variables,
 	)
 
-	log.Printf("Template data content length: %d", len(templateData.Content))
+	log.Printf("Template data content length: %d, tags: %v", len(templateData.Content), templateData.Tags)
 
 	// Render template
 	templatePath := cfg.Template.Path
@@ -255,4 +261,18 @@ func processFile(inputPath, outputDir string, cfg *config.Config, geminiClient *
 	}
 
 	return true
+}
+
+func deduplicateTags(tags []string) []string {
+	seen := make(map[string]bool)
+	var result []string
+	
+	for _, tag := range tags {
+		if !seen[tag] {
+			seen[tag] = true
+			result = append(result, tag)
+		}
+	}
+	
+	return result
 }
